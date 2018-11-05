@@ -8,16 +8,26 @@
  */
 class Solution {
 public:
-  bool hasCycle(ListNode *head) {
+  ListNode *detectCycle(ListNode *head) {
+    if (head == NULL || head->next == NULL)
+      return NULL;
+
     ListNode* fast = head;
     ListNode* slow = head;
-    while (slow && fast && fast->next) {
+
+    while(fast->next && fast->next->next) {
       slow = slow->next;
       fast = fast->next->next;
       if (slow == fast) {
-        return true;
+        fast = head;
+        while(slow != fast) {
+          slow = slow->next;
+          fast = fast->next;
+        }
+        return fast;
       }
     }
-    return false;
+
+    return NULL;
   }
 };
