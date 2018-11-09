@@ -1,39 +1,9 @@
-var MyLinkedListNode = function(val = 0, prev = null, next = null) {
-  this.val = val;
-  this.prev = prev;
-  this.next = next;
-}
-
 /**
  * Initialize your data structure here.
  */
 var MyLinkedList = function() {
-  this.size = 0;
-  this.head = new MyLinkedListNode();
-  this.tail = new MyLinkedListNode();
-
-  this.head.next = this.tail;
-  this.tail.prev = this.head;
-};
-
-MyLinkedList.prototype._findFromTail = function(index, curIndex, node) {
-  if (index === curIndex) return node;
-  if (node === this.head) return null;
-  return this._findFromTail(index, curIndex - 1, node.prev);
-};
-
-MyLinkedList.prototype._findFromHead = function(index, curIndex, node) {
-  if (index === curIndex) return node;
-  if (node === this.tail) return null;
-  return this._findFromHead(index, curIndex + 1, node.next);
-};
-
-MyLinkedList.prototype._find = function(index) {
-  if (index > this.size / 2) {
-    return this._findFromTail(index, this.size-1, this.tail.prev);
-  }
-  return this._findFromHead(index, 0, this.head.next);
-};
+  this.list = []
+}
 
 /**
  * Get the value of the index-th node in the linked list. If the index is invalid, return -1.
@@ -41,13 +11,8 @@ MyLinkedList.prototype._find = function(index) {
  * @return {number}
  */
 MyLinkedList.prototype.get = function(index) {
-  if (index >= this.size || index <0) return -1;
-  let cur = this._find(index);
-  if (cur !== null) {
-    return cur.val;
-  }
-  return -1;
-};
+  return this.list[index] === undefined ? -1 : this.list[index]
+}
 
 /**
  * Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list.
@@ -55,11 +20,8 @@ MyLinkedList.prototype.get = function(index) {
  * @return {void}
  */
 MyLinkedList.prototype.addAtHead = function(val) {
-  let node = new MyLinkedListNode(val, this.head, this.head.next);
-  this.head.next.prev = node;
-  this.head.next = node;
-  this.size++;
-};
+  this.list.unshift(val)
+}
 
 /**
  * Append a node of value val to the last element of the linked list.
@@ -67,11 +29,8 @@ MyLinkedList.prototype.addAtHead = function(val) {
  * @return {void}
  */
 MyLinkedList.prototype.addAtTail = function(val) {
-  let node = new MyLinkedListNode(val, this.tail.prev, this.tail);
-  this.tail.prev.next = node;
-  this.tail.prev = node;
-  this.size++;
-};
+  this.list.push(val)
+}
 
 /**
  * Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted.
@@ -80,18 +39,8 @@ MyLinkedList.prototype.addAtTail = function(val) {
  * @return {void}
  */
 MyLinkedList.prototype.addAtIndex = function(index, val) {
-  if (index > this.size || index < 0) return;
-  if (index == 0) this.addAtHead(val);
-  else if (index == this.size) this.addAtTail(val);
-  else {
-    let cur = this._find(index);
-    if (cur !== null) {
-      cur = cur.prev;
-      let node = new MyLinkedListNode(val, cur, cur.next);
-      cur.next.prev = node;
-      cur.next = node;
-      this.size++;
-    }
+  if (this.list.length >= index) {
+    this.list.splice(index, 0, val)
   }
 };
 
@@ -101,23 +50,11 @@ MyLinkedList.prototype.addAtIndex = function(index, val) {
  * @return {void}
  */
 MyLinkedList.prototype.deleteAtIndex = function(index) {
-  if (index >= this.size || index < 0) return;
-  let cur = this._find(index);
-  if (cur !== null) {
-    cur.prev.next = cur.next;
-    cur.next.prev = cur.prev;
-    this.size--;
-  }
-};
+  this.list.splice(index, 1)
+}
 
 MyLinkedList.prototype.printAll = function() {
-  let result = []
-  let cur = this.head.next;
-  while (cur !== this.tail) {
-    result.push(cur.val)
-    cur = cur.next
-  }
-  console.log(this.size, result)
+  console.log(this.list.length, this.list)
 }
 
 var obj =new MyLinkedList()
