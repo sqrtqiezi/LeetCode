@@ -2,55 +2,58 @@
  * @param {string} input
  * @return {number[]}
  */
+let cached
 var diffWaysToCompute = function(input) {
-  let i = 0, j;
-  const arr = [];
-  while (i < input.length) {
-    for (j = i + 1;
-      j < input.length && (input[j].charCodeAt() < 58 && input[j].charCodeAt() > 47);
-      j++){}
-    arr.push(Number(input.substring(i, j)))
-    if (j < input.length) {
-      arr.push(input[j]);
-    }
-    i = j + 1;
-  }
-  return divide(arr);
+  cached = Object.create(null);
+  return divide(input, 0, input.length);
 };
 
-var divide = function (arr) {
-  if (arr.length === 1) {
-    return arr;
-  }
-  if (arr.length === 3) {
-    return [compute(arr)];
-  }
-  const result = [];
-  for (let i = 1; i < arr.length; i+=2) {
-    const left = divide(arr.slice(0, i));
-    const right = divide(arr.slice(i + 1));
-    const op = arr[i];
-    left.forEach(x => {
-      right.forEach(y => {
-        result.push(compute([x, op, y]));
-      })
-    })
-  }
-  return result;
+const regex = /[*+-]/
+var isOperator = function (c) {
+  return regex.test(c);
 }
 
-var compute = function (arr) {
-  const op = arr[1];
+var divide = function (expr, begin, end) {
+  const key = `${begin}-${end}`;
+  if (cached[key]) return cached[key];
+
+  const ans = [];
+  for(let i = begin+1; i < end; i++) {
+    if (isOperator(expr[i])) {
+      const l_ans = divide(expr, begin, i);
+      const r_ans = divide(expr, i+1, end);
+
+      l_ans.forEach(x => {
+        r_ans.forEach(y => {
+          ans.push(getMethod(expr[i])(x,y));
+        })
+      })
+    }
+  }
+
+  if (ans.length > 0) {
+    cached[key] = ans;
+  } else {
+    cached[key] = [Number(expr.slice(begin, end))];
+  }
+  return cached[key];
+}
+
+var getMethod = function (op) {
   switch(op) {
     case '+':
-      return arr[0] + arr[2];
+      return (x,y) => x + y;
     case '-':
-      return arr[0] - arr[2];
+      return (x,y) => x - y;
     case '*':
-      return arr[0] * arr[2];
+      return (x,y) => x * y;
     default:
       throw new Error('do not support this operator:' + op);
   }
 }
 
+
 console.log(diffWaysToCompute("10+5"));
+console.log(cached);
+console.log(diffWaysToCompute("2*3-4*5"));
+console.log(cached);
